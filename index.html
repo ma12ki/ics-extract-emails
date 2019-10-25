@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<head>
+  <title>Extract emails from ICS</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    textarea {
+      width: 40%;
+      min-height: 80vh;
+    }
+  </style>
+  <script>
+    function convert() {
+      const input = document.getElementById("input").value || "";
+      const parsed = input.replace(/\r?\n /gi, "");
+      const emails = parsed
+        .split(/[:;=\r\n]/g)
+        .map(str => {
+          const val = (str.match(
+            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/
+          ) || [])[0];
+          return val;
+        })
+        .filter(Boolean);
+      const uniqueEmails = {};
+      emails.forEach(email => (uniqueEmails[email] = true));
+      const sortedEmails = Object.keys(uniqueEmails)
+        .map(email => email.toLowerCase())
+        .sort();
+
+      document.getElementById("output").value = sortedEmails.join("\n");
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <textarea id="input" placeholder="Paste ICS contents here"></textarea>
+    <button type="button" onclick="convert()">Extract emails =></button>
+    <textarea id="output" placeholder="Emails will show up here"></textarea>
+  </div>
+</body>
